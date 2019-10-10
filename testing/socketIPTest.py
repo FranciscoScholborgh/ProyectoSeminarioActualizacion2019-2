@@ -1,15 +1,16 @@
 import socket
 import sys
+import datetime
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-
-server_address = ("192.168.1.67", 9001)
-print(socket.gethostname())
+# Connect the socket to the port where the server is listening
+server_address = ('', 9001)
 sock.bind(server_address)
 sock.listen()
 
 while True:
+    print("listening...")
     # Wait for a connection
     connection, client_address = sock.accept()
     print("alguien se conecto: ", client_address)
@@ -22,7 +23,10 @@ while True:
                 connection.close()
                 break
             print(data)   
-            connection.sendall(data)
+            date = datetime.datetime.now()
+            fecha = "fecha: " + str(date.day) + "/" + str(date.month) + "/" + str(date.year) + " - hora: " + str(date.hour)  + ":" + str(date.minute) + ":" + str(date.second)
+            message = fecha.encode()
+            connection.sendall(message)
     except(ConnectionAbortedError):
         pass
     finally:
