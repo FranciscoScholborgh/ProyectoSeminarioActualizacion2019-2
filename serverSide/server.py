@@ -1,13 +1,14 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5 import uic
 import sys
 
-class GUI(QtWidgets.QMainWindow):
+class GUI(QMainWindow):
 
     def __init__(self):
-        super(GUI, self).__init__() # Call the inherited classes __init__ method
-        uic.loadUi('vista/cliente.ui', self) # Load the .ui file
-        self.show() # Show the GUI
+        super(GUI, self).__init__()
+        uic.loadUi('vista/server.ui', self)
+        self.show()
 
-app = QtWidgets.QApplication(sys.argv)
+app = QApplication(sys.argv)
 gui = GUI()
 app.exec_()
