@@ -52,7 +52,7 @@ class SerialArduino(Arduino):
         self.port = port
         self.baud = baud
         self.running = False
-        #self.serialCommunication = serial.Serial(port, baud)
+        self.serialCommunication = None
 
     def getPort(self):
         return self.port
@@ -74,9 +74,19 @@ class SerialArduino(Arduino):
 
     def start_reading(self):
         self.running = True
+        self.serialCommunication = serial.Serial(self.port, self.baud)
+        estado_anterior = "LOCKED"
         while(self.running):
-            print("Reading arduino")
-            time.sleep(2)
+            info = self.serialCommunication.readline()
+            data = str(info, 'ascii').split(";")[0]
+            if(data != estado_anterior):
+                estado_anterior = data
+                if(data == "BREAK IN"):
+                    print("NOTIFICA")
+                else:
+                    print("YA NO")
+            time.sleep(0.25)
+        self.serialCommunication.close()
 
     def stop_reading(self):
         self.running = False
