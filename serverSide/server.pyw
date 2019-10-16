@@ -5,6 +5,7 @@ from PyQt5 import uic
 import sys
 from logica.Arduino import ArduinoDetector
 import threading, time, os, inspect
+from logica.Server import TCPServer
 
 class GUI(QMainWindow):
 
@@ -23,9 +24,11 @@ class GUI(QMainWindow):
             print("Seleccione un opcion, no sea prro :V")
         else:
             selected_protocol = None
+            server = None
             if(tcp):
                 selected_protocol = "TCP"
                 print("TCP SERVER")
+                server = TCPServer()
             elif(udp):
                 selected_protocol = "UDP"
                 print("UDP SERVER")
@@ -43,8 +46,11 @@ class GUI(QMainWindow):
                 self.stateBtn.setIcon(icon)
                 self.stateBtn.setIconSize(QSize(30, 30))
                 self.stateBtn.clicked.connect(self.stopServer)
+                self.arduino.attach(server)
                 t = threading.Thread(target=self.arduino.start_reading, daemon=True)
                 t.start()
+                server_thread = threading.Thread(target=server.run_server, daemon=True)
+                server_thread.start()
             else:
                 print("No ha sido encontrado el dispositivo de alarma")
         time.sleep(1)

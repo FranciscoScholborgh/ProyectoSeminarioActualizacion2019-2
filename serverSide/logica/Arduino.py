@@ -1,6 +1,8 @@
+from __future__ import annotations
 import serial.tools.list_ports
 from PyQt5.QtCore import QThread
 from abc import ABCMeta, abstractmethod
+from logica.Interfaces import Subject
 import time
 
 class ArduinoDetector():
@@ -46,13 +48,15 @@ class Arduino(metaclass=ABCMeta):
     def stop_reading(self):
         pass
 
-class SerialArduino(Arduino):
+class SerialArduino(Arduino, Subject):
 
     def __init__(self, port, baud):
         self.port = port
         self.baud = baud
         self.running = False
         self.serialCommunication = None
+        self.estado_anterior = "LOCKED"
+        self.observers: List[Observer] = []
 
     def getPort(self):
         return self.port
@@ -72,19 +76,32 @@ class SerialArduino(Arduino):
     def setRunning(self, state):
         self.running = state
 
+    def attach(self, observer: Observer):
+        self.observers.append(observer)
+
+    def detach(self, observer: Observer):
+        self.observers.remove(observer)
+
+    def notify(self):
+        for observer in self.observers:
+            observer.update(self.estado_anterior)
+
     def start_reading(self):
         self.running = True
         self.serialCommunication = serial.Serial(self.port, self.baud)
-        estado_anterior = "LOCKED"
         while(self.running):
             info = self.serialCommunication.readline()
             data = str(info, 'ascii').split(";")[0]
-            if(data != estado_anterior):
-                estado_anterior = data
+            if(data != self.estado_anterior):
+                self.estado_anterior = data
                 if(data == "BREAK IN"):
                     print("NOTIFICA")
-                else:
+                    self.notify()        
+                elif(data == "LOCKED"):
                     print("YA NO")
+                    self.notify()
+                else:
+                    self.estado_anterior = "LOCKED"
             time.sleep(0.25)
         self.serialCommunication.close()
 

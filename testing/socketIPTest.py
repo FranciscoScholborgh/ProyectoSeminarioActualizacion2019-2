@@ -1,6 +1,7 @@
 import socket
 import sys
 import datetime
+import time
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -17,17 +18,19 @@ while True:
     try:
         # Receive the data in small chunks and retransmit it
         while True:
-            data = connection.recv(1024)
-            if not data:
-                print('no more data from', client_address)
-                connection.close()
-                break
-            print(data)   
+            #data = connection.recv(1024)
+            #if not data:
+            #    print('no more data from', client_address)
+            #    connection.close()
+            #    break
+            #print(data)   
             date = datetime.datetime.now()
             fecha = "fecha: " + str(date.day) + "/" + str(date.month) + "/" + str(date.year) + " - hora: " + str(date.hour)  + ":" + str(date.minute) + ":" + str(date.second)
             message = fecha.encode()
             connection.sendall(message)
+            time.sleep(1)
     except(ConnectionAbortedError):
+        print("OUT")
         pass
     finally:
         # Clean up the connection
