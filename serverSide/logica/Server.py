@@ -25,9 +25,14 @@ class TCPServer(Server, Observer):
     def update(self, arg):
         print("Servidor TCP Notificado: ", arg)
         data = arg.encode()
+        lost_connections = []
         for cliente in self.connections:
-            cliente.sendall(data)
-
+            try:
+                cliente.sendall(data)
+            except OSError:
+                lost_connections.append(cliente)
+        for lost in lost_connections:
+            self.connections.remove(lost)
     def run_server(self):
         self.running = True
         print("Runing server....")
