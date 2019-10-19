@@ -5,7 +5,7 @@ from PyQt5 import uic
 import sys
 from logica.Arduino import ArduinoDetector
 import threading, time, os, inspect
-from logica.Server import TCPServer
+from logica.Server import TCPServer, UDPServer
 
 class GUI(QMainWindow):
 
@@ -32,6 +32,7 @@ class GUI(QMainWindow):
             elif(udp):
                 selected_protocol = "UDP"
                 print("UDP SERVER")
+                self.server = UDPServer()
             else:
                 selected_protocol = "RMI"
                 print("RMI SERVER")

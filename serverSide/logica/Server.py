@@ -33,6 +33,7 @@ class TCPServer(Server, Observer):
                 lost_connections.append(cliente)
         for lost in lost_connections:
             self.connections.remove(lost)
+
     def run_server(self):
         self.running = True
         print("Runing server....")
@@ -51,10 +52,44 @@ class TCPServer(Server, Observer):
         self.running = False
         self.sock.close()
 
-class UDPServer():
+class UDPServer(Server, Observer):
 
     def __init__(self):
-        print("TCP RULES")
+        print("UDP RULES")
+        self.running = False
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_address = ('', 9001)
+        self.sock.bind(server_address)
+        self.connections: List[connection] = []
+        
+    def update(self, arg):
+        print("Servidor UDP Notificado: ", arg)
+        data = arg.encode()
+        lost_connections = []
+        for address in self.connections:
+            try:
+                self.sock.sendto(data, address)
+            except OSError:
+                lost_connections.append(address)
+        for lost in lost_connections:
+            self.connections.remove(lost)
+
+    def run_server(self):
+        self.running = True
+        print("Runing server....")
+        while(self.running): 
+            #Self.sock.listen()
+            try:
+                data, address = self.sock.recvfrom(2)
+                self.connections.append(address)
+            except OSError:
+                self.update("SHUTDOWN")
+                print("RESULTADO: ", self.sock.close())
+
+    def shutdown_server(self):
+        self.running = False
+        self.update("SHUTDOWN")
+        self.sock.close()
 
 class RMIServer():
 
