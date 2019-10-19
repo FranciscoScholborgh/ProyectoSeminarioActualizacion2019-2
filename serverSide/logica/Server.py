@@ -68,6 +68,7 @@ class UDPServer(Server, Observer):
         lost_connections = []
         for address in self.connections:
             try:
+                print("Sending Data: ", data, " From: ", address)
                 self.sock.sendto(data, address)
             except OSError:
                 lost_connections.append(address)
@@ -81,6 +82,7 @@ class UDPServer(Server, Observer):
             #Self.sock.listen()
             try:
                 data, address = self.sock.recvfrom(2)
+                print("Data: ", data, " From: ", address)
                 self.connections.append(address)
             except OSError:
                 self.update("SHUTDOWN")

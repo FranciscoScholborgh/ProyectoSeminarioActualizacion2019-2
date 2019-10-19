@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
 from logica.Interfaces import Observer 
-from logica.Client import TCPClientNotifier
+from logica.Client import TCPClientNotifier, UDPClientNotifier
 import sys, time, threading, winsound
 
 class SelectorProtocolGUI(QMainWindow):
@@ -63,7 +63,12 @@ class GUI(QMainWindow):
     def __turnON(self):
         self.__disable_buttons()
         try:
-            self.notifer = TCPClientNotifier()
+            protocol = self.configBox.get_selected_protocol()
+            if(protocol == "TCP"):
+                self.notifer = TCPClientNotifier()
+            elif(protocol == "UDP"):
+                print("I TRIED?")
+                self.notifer = UDPClientNotifier()
             print("Activated Alarm")
             print("Notifier: ", self.notifer)
             self.status_lbl.setText("Estado alarma: Activada")
