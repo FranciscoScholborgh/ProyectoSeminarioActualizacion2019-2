@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
+    <width>360</width>
     <height>360</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>480</width>
+    <width>360</width>
     <height>360</height>
    </size>
   </property>
@@ -157,7 +157,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QToolButton" name="onBtn">
+         <widget class="QToolButton" name="switch_btn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
@@ -175,44 +175,6 @@ background-color: rgb(50, 205, 50);</string>
           </property>
           <property name="text">
            <string>ON</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QToolButton" name="offBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>28</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(255, 99, 71);</string>
-          </property>
-          <property name="text">
-           <string>OFF</string>
           </property>
          </widget>
         </item>
@@ -253,7 +215,7 @@ background-color: rgb(255, 99, 71);</string>
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="statusLbl">
+     <widget class="QLabel" name="status_lbl">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -266,7 +228,7 @@ background-color: rgb(255, 99, 71);</string>
        </font>
       </property>
       <property name="text">
-       <string>Estado: ON/OFF</string>
+       <string>Estado alarma: Desactivada </string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
