@@ -5,7 +5,7 @@ from PyQt5 import uic
 import sys
 from logica.Arduino import ArduinoDetector
 import threading, time, os, inspect
-from logica.Server import TCPServer, UDPServer
+from logica.Server import TCPServer, UDPServer, RMIServer, ArduinoRMIService
 
 class GUI(QMainWindow):
 
@@ -36,6 +36,8 @@ class GUI(QMainWindow):
             else:
                 selected_protocol = "RMI"
                 print("RMI SERVER")
+                rmiService = ArduinoRMIService()
+                self.server = RMIServer(rmiService)
             ardDetector = ArduinoDetector.getInstance()
             self.arduino = ardDetector.detectarPrototipo()
             if(self.arduino is not None):
@@ -47,7 +49,10 @@ class GUI(QMainWindow):
                 self.stateBtn.setIcon(icon)
                 self.stateBtn.setIconSize(QSize(30, 30))
                 self.stateBtn.clicked.connect(self.stopServer)
-                self.arduino.attach(self.server)
+                if(selected_protocol != "RMI"):
+                    self.arduino.attach(self.server)
+                else:
+                    self.arduino.attach(rmiService)
                 t = threading.Thread(target=self.arduino.start_reading, daemon=True)
                 t.start()
                 server_thread = threading.Thread(target=self.server.run_server, daemon=True)

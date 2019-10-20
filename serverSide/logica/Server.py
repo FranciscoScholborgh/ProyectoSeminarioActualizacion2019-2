@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from logica.Interfaces import Observer
-import socket
+import socket, threading, Pyro4
 
 class Server(metaclass=ABCMeta):
 
@@ -93,7 +93,42 @@ class UDPServer(Server, Observer):
         self.update("SHUTDOWN")
         self.sock.close()
 
-class RMIServer():
+@Pyro4.expose
+@Pyro4.behavior(instance_mode="single")
+class ArduinoRMIService(Observer):
 
     def __init__(self):
-        print("TCP RULES")
+        self.estado = "LOCKED"
+
+    def update(self, arg):
+        self.estado = arg
+        print("estado actualizado a: ", self.estado)
+    
+    def getEstado(self):
+        return self.estado
+
+class RMIServer(Server):
+
+    def __init__(self, rmiService : ArduinoRMIService):
+        print("RMI RULES")
+        self.service = rmiService
+
+    def run_server (self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        host_name = s.getsockname()[0]
+        s.close()
+        self.daemon = Pyro4.Daemon(host=host_name, port=53546)
+        self.daemon.register(self.service, "interface")
+        self.thread = threading.Thread(target=self.daemonLoop)
+        self.thread.start()
+        print("RMI SERVER ENABLED")
+
+    def shutdown_server(self):
+        print("Called for daemon shutdown")
+        self.service.update("SHUTDOWN")
+        self.daemon.shutdown()
+
+    def daemonLoop(self):
+        self.daemon.requestLoop()
+        print("Daemon has shut down no prob")
