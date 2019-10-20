@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
 from logica.Interfaces import Observer 
-from logica.Client import TCPClientNotifier, UDPClientNotifier
+from logica.Client import TCPClientNotifier, UDPClientNotifier, RMIClientNotifier
 import sys, time, threading, winsound
 
 class SelectorProtocolGUI(QMainWindow):
@@ -67,8 +67,10 @@ class GUI(QMainWindow):
             if(protocol == "TCP"):
                 self.notifer = TCPClientNotifier()
             elif(protocol == "UDP"):
-                print("I TRIED?")
                 self.notifer = UDPClientNotifier()
+            else:
+                print("rmi selected?")
+                self.notifer = RMIClientNotifier()
             print("Activated Alarm")
             print("Notifier: ", self.notifer)
             self.status_lbl.setText("Estado alarma: Activada")

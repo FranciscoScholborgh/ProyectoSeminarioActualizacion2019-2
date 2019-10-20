@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from logica.Interfaces import Subject
-import socket
+import socket, Pyro4, time
 
 class ClientNotifier(metaclass=ABCMeta):
 
@@ -26,7 +26,6 @@ class TCPClientNotifier(ClientNotifier, Subject):
         self.observers: List[Observer] = []
         print("DO I GET HERE?")
         
-
     def attach(self, observer: Observer):
         self.observers.append(observer)
 
@@ -119,3 +118,48 @@ class UDPClientNotifier(ClientNotifier, Subject):
     def shutdown(self):
         self.activated = False
         self.sock.close()
+
+class RMIClientNotifier(ClientNotifier, Subject):
+
+    def __init__(self):
+        self.connection = Pyro4.Proxy("PYRO:interface@192.168.1.56:53546")
+        self.estado_anterior = "LOCKED"
+        self.observers: List[Observer] = []
+        print("Do i get it?")
+
+    def attach(self, observer: Observer):
+        self.observers.append(observer)
+
+    def detach(self, observer: Observer):
+        self.observers.remove(observer)
+
+    def notify(self):
+        for observer in self.observers:
+            observer.update(self.estado_anterior)
+
+    def run(self):
+        print("ON THE RUN")
+        self.activated = True
+        self.estado_anterior = "LOCKED"
+        
+        while (self.activated):
+            estado = self.connection.getEstado()
+            if(estado != self.estado_anterior):
+                if(estado == "BREAK IN"):
+                    self.estado_anterior = estado
+                    print("Someony BREAK IN")
+                    self.notify()
+                elif(estado  == "LOCKED"):
+                    self.estado_anterior = estado 
+                    print("NOW IT'S LOCKED")
+                    self.notify()
+                elif(estado  == "SHUTDOWN"):
+                    self.estado_anterior = estado 
+                    print("SHUTDOWN SERVER")
+                    self.notify()
+                else:
+                    print("UNKWON COMMAND")
+            time.sleep(0.25)
+
+    def shutdown(self):
+        self.activated = False
