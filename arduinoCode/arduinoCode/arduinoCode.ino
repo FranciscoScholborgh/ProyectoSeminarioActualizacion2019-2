@@ -13,10 +13,9 @@ void setup() {
 
 void alarma() {
     digitalWrite(ledPIN, HIGH);   // poner el Pin en HIGH
-    delay(100);                   // esperar un segundo
+    delay(100);               
     digitalWrite(ledPIN, LOW);    // poner el Pin en LOW
-    delay(100);                   // esperar un segundo
-}
+    delay(100);                   
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -29,7 +28,6 @@ void loop() {
   }
   else{
     //noTone(buzzer);
-    //desactivarAlarma()
     Serial.println("LOCKED;");
   }
   delay(250);

@@ -16,15 +16,14 @@ class ClientNotifier(metaclass=ABCMeta):
 
 class TCPClientNotifier(ClientNotifier, Subject):
 
-    def __init__(self):
+    def __init__(self, ip_server, puerto):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ('192.168.1.56', 9001)#67
+        server_address = (ip_server, puerto)
         self.sock.connect(server_address)
         self.sock.settimeout(None)
         self.activated = False
         self.estado_anterior = "LOCKED"
         self.observers: List[Observer] = []
-        print("DO I GET HERE?")
         
     def attach(self, observer: Observer):
         self.observers.append(observer)
@@ -37,7 +36,6 @@ class TCPClientNotifier(ClientNotifier, Subject):
             observer.update(self.estado_anterior)
 
     def run(self):
-        print("ON THE RUN")
         self.activated = True
         while (self.activated):
             try:
@@ -46,18 +44,13 @@ class TCPClientNotifier(ClientNotifier, Subject):
                 if(command != self.estado_anterior):      
                     if(command == "BREAK IN"):
                         self.estado_anterior = command
-                        print("Someony BREAK IN")
                         self.notify()
                     elif(command == "LOCKED"):
                         self.estado_anterior = command
-                        print("NOW IT'S LOCKED")
                         self.notify()
                     elif(command == "SHUTDOWN"):
                         self.estado_anterior = command
-                        print("SHUTDOWN SERVER")
                         self.notify()
-                    else:
-                        print("UNKWON COMMAND")
             except:
                 self.sock.close()
 
@@ -67,15 +60,14 @@ class TCPClientNotifier(ClientNotifier, Subject):
 
 class UDPClientNotifier(ClientNotifier, Subject):
 
-    def __init__(self):
+    def __init__(self, ip_server, puerto):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.server_address = ('192.168.1.56', 9001)#67
+        self.server_address = (ip_server, puerto)
         self.sock.connect(self.server_address)
         self.sock.settimeout(None)
         self.activated = False
         self.estado_anterior = "LOCKED"
         self.observers: List[Observer] = []
-        print("DO I GET HERE?")
         
     def attach(self, observer: Observer):
         self.observers.append(observer)
@@ -88,30 +80,23 @@ class UDPClientNotifier(ClientNotifier, Subject):
             observer.update(self.estado_anterior)
 
     def run(self):
-        print("ON THE RUN")
         self.activated = True
         while (self.activated):
             try:
                 message = 'ok'.encode()
                 self.sock.sendto(message, self.server_address)
                 data, server = self.sock.recvfrom(pow(2,3))
-                print("recibi?")
                 command = data.decode('ascii')
                 if(command != self.estado_anterior):      
                     if(command == "BREAK IN"):
                         self.estado_anterior = command
-                        print("Someony BREAK IN")
                         self.notify()
                     elif(command == "LOCKED"):
                         self.estado_anterior = command
-                        print("NOW IT'S LOCKED")
                         self.notify()
                     elif(command == "SHUTDOWN"):
                         self.estado_anterior = command
-                        print("SHUTDOWN SERVER")
                         self.notify()
-                    else:
-                        print("UNKWON COMMAND")
             except:
                 self.sock.close()
 
@@ -121,11 +106,10 @@ class UDPClientNotifier(ClientNotifier, Subject):
 
 class RMIClientNotifier(ClientNotifier, Subject):
 
-    def __init__(self):
-        self.connection = Pyro4.Proxy("PYRO:interface@192.168.1.56:53546")
+    def __init__(self, ip_server, puerto):
+        self.connection = Pyro4.Proxy("PYRO:interface@" + ip_server + ":" + str(puerto))
         self.estado_anterior = "LOCKED"
         self.observers: List[Observer] = []
-        print("Do i get it?")
 
     def attach(self, observer: Observer):
         self.observers.append(observer)
@@ -138,7 +122,6 @@ class RMIClientNotifier(ClientNotifier, Subject):
             observer.update(self.estado_anterior)
 
     def run(self):
-        print("ON THE RUN")
         self.activated = True
         self.estado_anterior = "LOCKED"
         
@@ -147,18 +130,13 @@ class RMIClientNotifier(ClientNotifier, Subject):
             if(estado != self.estado_anterior):
                 if(estado == "BREAK IN"):
                     self.estado_anterior = estado
-                    print("Someony BREAK IN")
                     self.notify()
                 elif(estado  == "LOCKED"):
                     self.estado_anterior = estado 
-                    print("NOW IT'S LOCKED")
                     self.notify()
                 elif(estado  == "SHUTDOWN"):
                     self.estado_anterior = estado 
-                    print("SHUTDOWN SERVER")
                     self.notify()
-                else:
-                    print("UNKWON COMMAND")
             time.sleep(0.25)
 
     def shutdown(self):

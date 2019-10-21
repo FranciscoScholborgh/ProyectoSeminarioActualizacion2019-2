@@ -14,21 +14,32 @@ class SelectorProtocolGUI(QMainWindow):
         self.setWindowModality(Qt.ApplicationModal)
         self.selectBtn.clicked.connect(self.select_protocolo)
         self.selected_protocol = "TCP"
+        self.default_serv = self.host_server.text()
+        self.default_port = self.port.text()
         
     def select_protocolo(self):
-        tcp = self.tcp.isChecked()
-        udp = self.udp.isChecked()
-        rmi = self.rmi.isChecked()
-        if(tcp):
-            self.selected_protocol = "TCP"
-        elif(udp):
-            self.selected_protocol = "UDP"
+        if(self.host_server.text() != self.default_serv and self.port.text() != self.default_port):
+            tcp = self.tcp.isChecked()
+            udp = self.udp.isChecked()
+            rmi = self.rmi.isChecked()
+            if(tcp):
+                self.selected_protocol = "TCP"
+            elif(udp):
+                self.selected_protocol = "UDP"
+            else:
+                self.selected_protocol = "RMI"
+            self.hide()
         else:
-            self.selected_protocol = "RMI"
-        self.hide()
+            print("No ha seleccionado un servidor")
 
     def get_selected_protocol(self):
         return self.selected_protocol
+
+    def get_selected_server(self):
+        return self.host_server.text()
+
+    def get_selected_port(self):
+        return self.port.text()
 
 
 class GUI(QMainWindow):
@@ -64,13 +75,15 @@ class GUI(QMainWindow):
         self.__disable_buttons()
         try:
             protocol = self.configBox.get_selected_protocol()
+            server_host = self.configBox.get_selected_server()
+            port = int(self.configBox.get_selected_port())
             if(protocol == "TCP"):
-                self.notifer = TCPClientNotifier()
+                self.notifer = TCPClientNotifier(server_host, port)
             elif(protocol == "UDP"):
-                self.notifer = UDPClientNotifier()
+                self.notifer = UDPClientNotifier(server_host, port)
             else:
                 print("rmi selected?")
-                self.notifer = RMIClientNotifier()
+                self.notifer = RMIClientNotifier(server_host, port)
             print("Activated Alarm")
             print("Notifier: ", self.notifer)
             self.status_lbl.setText("Estado alarma: Activada")
